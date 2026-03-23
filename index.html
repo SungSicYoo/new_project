@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SungSic's Graffiti Wall</title>
+    <title>SungSic's Graffiti Wall & Partnership</title>
     <style>
         :root {
             --bg-color: #050505;
             --accent-color: #38bdf8;
             --toolbar-bg: rgba(30, 41, 59, 0.8);
+            --modal-bg: rgba(15, 23, 42, 0.95);
         }
 
         body, html {
@@ -81,11 +82,11 @@
             transform: translateX(-50%);
             background: var(--toolbar-bg);
             backdrop-filter: blur(10px);
-            padding: 15px 25px;
+            padding: 10px 25px;
             border-radius: 50px;
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             border: 1px solid rgba(255,255,255,0.1);
             z-index: 100;
@@ -98,15 +99,15 @@
         }
 
         label {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #94a3b8;
             font-weight: bold;
         }
 
         input[type="color"] {
             border: none;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             cursor: pointer;
             background: none;
         }
@@ -114,6 +115,7 @@
         input[type="range"] {
             cursor: pointer;
             accent-color: var(--accent-color);
+            width: 80px;
         }
 
         .btn {
@@ -137,14 +139,105 @@
             color: black;
         }
 
-        .btn-clear {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+        .btn-inquiry {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
+            border: 1px solid rgba(168, 85, 247, 0.4);
         }
 
-        .btn-clear:hover {
-            background: #ef4444;
+        .btn-inquiry:hover {
+            background: #a855f7;
             color: white;
+        }
+
+        /* 모달 스타일 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--modal-bg);
+            padding: 40px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            position: relative;
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .modal-content p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea { height: 120px; resize: none; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4); }
+
+        .btn-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: none; border: none;
+            color: #64748b; font-size: 1.5rem;
+            cursor: pointer;
         }
 
         /* 안내 문구 */
@@ -188,8 +281,36 @@
         </div>
 
         <div class="tool-group">
-            <button id="clearBtn" class="btn btn-clear">전체 삭제</button>
-            <button id="saveBtn" class="btn" style="background: rgba(56, 189, 248, 0.2); color: var(--accent-color);">이미지 저장</button>
+            <button id="clearBtn" class="btn" style="color: #ef4444;">삭제</button>
+        </div>
+
+        <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
+
+        <button class="btn btn-inquiry" onclick="toggleModal(true)">제휴 문의</button>
+    </div>
+
+    <!-- 제휴 문의 모달 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <button class="btn-close" onclick="toggleModal(false)">&times;</button>
+            <h2>제휴 문의</h2>
+            <p>유성식과의 협업 또는 제휴를 원하시면 아래 폼을 작성해 주세요. 확인 후 연락드리겠습니다.</p>
+            
+            <form action="https://formspree.io/f/maqpgvqy" method="POST">
+                <div class="form-group">
+                    <label>성함 / 기업명</label>
+                    <input type="text" name="name" placeholder="홍길동" required>
+                </div>
+                <div class="form-group">
+                    <label>이메일 주소</label>
+                    <input type="email" name="_replyto" placeholder="example@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label>문의 내용</label>
+                    <textarea name="message" placeholder="함께하고 싶은 아이디어나 문의 내용을 남겨주세요." required></textarea>
+                </div>
+                <button type="submit" class="btn-submit">문의 보내기</button>
+            </form>
         </div>
     </div>
 
@@ -201,127 +322,84 @@
         const drawBtn = document.getElementById('drawBtn');
         const eraseBtn = document.getElementById('eraseBtn');
         const clearBtn = document.getElementById('clearBtn');
-        const saveBtn = document.getElementById('saveBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
 
         let isDrawing = false;
         let lastX = 0;
         let lastY = 0;
         let mode = 'draw';
 
-        // 캔버스 크기 조절
         function resizeCanvas() {
             const tempImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             ctx.putImageData(tempImageData, 0, 0);
-            
-            // 초기 로드 시 저장된 내용 불러오기
             loadCanvas();
         }
 
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 그리기 시작
         function startDrawing(e) {
+            if (e.target.tagName !== 'CANVAS') return;
             isDrawing = true;
             [lastX, lastY] = getCoordinates(e);
         }
 
-        // 그리기 중
         function draw(e) {
             if (!isDrawing) return;
-            
             const [x, y] = getCoordinates(e);
-
             ctx.beginPath();
             ctx.moveTo(lastX, lastY);
             ctx.lineTo(x, y);
-            
             ctx.strokeStyle = mode === 'draw' ? colorPicker.value : '#050505';
             ctx.lineWidth = sizePicker.value;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            
-            // 브러시 효과 (약간의 그림자)
-            if (mode === 'draw') {
-                ctx.shadowBlur = 2;
-                ctx.shadowColor = colorPicker.value;
-            } else {
-                ctx.shadowBlur = 0;
-            }
-
+            if (mode === 'draw') { ctx.shadowBlur = 2; ctx.shadowColor = colorPicker.value; }
+            else { ctx.shadowBlur = 0; }
             ctx.stroke();
-            
             [lastX, lastY] = [x, y];
-            saveCanvas(); // 그릴 때마다 저장
+            saveCanvas();
         }
 
-        // 그리기 종료
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
+        function stopDrawing() { isDrawing = false; }
         function getCoordinates(e) {
             const clientX = e.touches ? e.touches[0].clientX : e.clientX;
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             return [clientX, clientY];
         }
 
-        // 이벤트 리스너
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         window.addEventListener('mouseup', stopDrawing);
-
         canvas.addEventListener('touchstart', startDrawing);
         canvas.addEventListener('touchmove', draw);
         window.addEventListener('touchend', stopDrawing);
 
-        // 모드 전환
-        drawBtn.onclick = () => {
-            mode = 'draw';
-            drawBtn.classList.add('active');
-            eraseBtn.classList.remove('active');
-        };
+        drawBtn.onclick = () => { mode = 'draw'; drawBtn.classList.add('active'); eraseBtn.classList.remove('active'); };
+        eraseBtn.onclick = () => { mode = 'erase'; eraseBtn.classList.add('active'); drawBtn.classList.remove('active'); };
+        clearBtn.onclick = () => { if (confirm('모든 낙서를 지우시겠습니까?')) { ctx.clearRect(0, 0, canvas.width, canvas.height); localStorage.removeItem('graffiti_data'); } };
 
-        eraseBtn.onclick = () => {
-            mode = 'erase';
-            eraseBtn.classList.add('active');
-            drawBtn.classList.remove('active');
-        };
-
-        // 전체 삭제
-        clearBtn.onclick = () => {
-            if (confirm('모든 낙서를 지우시겠습니까?')) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                localStorage.removeItem('graffiti_data');
-            }
-        };
-
-        // 이미지 저장
-        saveBtn.onclick = () => {
-            const link = document.createElement('a');
-            link.download = 'my-graffiti.png';
-            link.href = canvas.toDataURL();
-            link.click();
-        };
-
-        // 데이터 저장 (로컬 스토리지)
-        function saveCanvas() {
-            localStorage.setItem('graffiti_data', canvas.toDataURL());
-        }
-
-        // 데이터 로드
+        function saveCanvas() { localStorage.setItem('graffiti_data', canvas.toDataURL()); }
         function loadCanvas() {
             const dataURL = localStorage.getItem('graffiti_data');
             if (dataURL) {
                 const img = new Image();
-                img.onload = () => {
-                    ctx.drawImage(img, 0, 0);
-                };
+                img.onload = () => { ctx.drawImage(img, 0, 0); };
                 img.src = dataURL;
             }
         }
+
+        // 모달 토글
+        function toggleModal(show) {
+            modalOverlay.style.display = show ? 'flex' : 'none';
+        }
+
+        // 모달 외부 클릭 시 닫기
+        modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) toggleModal(false);
+        };
     </script>
 </body>
 </html>
