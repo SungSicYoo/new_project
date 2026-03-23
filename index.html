@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SungSic's Graffiti Wall & Partnership</title>
+    <title>SungSic's Graffiti Wall & Community</title>
     <style>
         :root {
             --bg-color: #050505;
@@ -17,16 +17,16 @@
             padding: 0;
             width: 100%;
             height: 100%;
-            overflow: hidden;
             background-color: var(--bg-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: white;
+            overflow-x: hidden;
         }
 
         /* 배경 질감 (벽돌 느낌) */
         body::before {
             content: "";
-            position: absolute;
+            position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
                 linear-gradient(30deg, #111 12%, transparent 12.5%, transparent 87%, #111 87.5%, #111),
@@ -39,6 +39,13 @@
             background-position: 0 0, 0 0, 40px 70px, 40px 70px, 0 0, 40px 70px;
             opacity: 0.3;
             z-index: -1;
+        }
+
+        .main-viewport {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
         }
 
         #canvas {
@@ -68,15 +75,9 @@
             opacity: 0.8;
         }
 
-        .header p {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-top: 5px;
-        }
-
         /* 하단 툴바 */
         .toolbar {
-            position: absolute;
+            position: fixed;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
@@ -98,26 +99,6 @@
             gap: 10px;
         }
 
-        label {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            font-weight: bold;
-        }
-
-        input[type="color"] {
-            border: none;
-            width: 25px;
-            height: 25px;
-            cursor: pointer;
-            background: none;
-        }
-
-        input[type="range"] {
-            cursor: pointer;
-            accent-color: var(--accent-color);
-            width: 80px;
-        }
-
         .btn {
             background: rgba(255,255,255,0.1);
             border: none;
@@ -129,25 +110,26 @@
             transition: 0.2s;
         }
 
-        .btn:hover {
-            background: var(--accent-color);
-            color: black;
+        .btn:hover { background: var(--accent-color); color: black; }
+        .btn.active { background: var(--accent-color); color: black; }
+
+        .btn-comment { background: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .btn-comment:hover { background: #22c55e; color: white; }
+
+        /* 댓글 섹션 */
+        .comment-section {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 100px 20px 50px;
+            background: transparent;
         }
 
-        .btn.active {
-            background: var(--accent-color);
-            color: black;
-        }
-
-        .btn-inquiry {
-            background: rgba(168, 85, 247, 0.2);
-            color: #a855f7;
-            border: 1px solid rgba(168, 85, 247, 0.4);
-        }
-
-        .btn-inquiry:hover {
-            background: #a855f7;
-            color: white;
+        #disqus_thread {
+            background: rgba(30, 41, 59, 0.5);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
         /* 모달 스타일 */
@@ -168,147 +150,81 @@
             border-radius: 24px;
             width: 100%;
             max-width: 450px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            position: relative;
             animation: modalSlideUp 0.3s ease-out;
+            position: relative;
         }
 
-        @keyframes modalSlideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes modalSlideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .modal-content h2 {
-            margin-top: 0;
-            color: var(--accent-color);
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-
-        .modal-content p {
-            color: #94a3b8;
-            font-size: 0.9rem;
-            margin-bottom: 30px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: #e2e8f0;
-        }
-
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #e2e8f0; }
         .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px;
-            background: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 10px;
-            color: white;
-            font-size: 1rem;
-            box-sizing: border-box;
+            width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155;
+            border-radius: 10px; color: white; box-sizing: border-box;
         }
+        .form-group textarea { height: 100px; resize: none; }
 
-        .form-group textarea { height: 120px; resize: none; }
+        .btn-submit { width: 100%; padding: 14px; background: var(--accent-color); color: #0f172a; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
 
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            background: var(--accent-color);
-            color: #0f172a;
-            border: none;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4); }
-
-        .btn-close {
-            position: absolute;
-            top: 20px; right: 20px;
-            background: none; border: none;
-            color: #64748b; font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* 안내 문구 */
-        .guide {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 0.7rem;
-            color: #475569;
-            text-align: right;
-        }
+        .guide { position: fixed; top: 20px; right: 20px; font-size: 0.7rem; color: #475569; text-align: right; z-index: 5; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Graffiti Wall</h1>
-        <p>유성식의 자유로운 낙서 공간</p>
+    <div class="main-viewport">
+        <div class="header">
+            <h1>Graffiti Wall</h1>
+        </div>
+
+        <div class="guide">
+            마우스나 터치로 그려보세요.<br>스크롤을 내려 댓글을 확인하세요.
+        </div>
+
+        <canvas id="canvas"></canvas>
     </div>
 
-    <div class="guide">
-        마우스나 터치로 그려보세요.<br>내용은 브라우저에 자동 저장됩니다.
+    <!-- 댓글 섹션 -->
+    <div class="comment-section" id="comments">
+        <h2 style="color: var(--accent-color); margin-bottom: 30px;">Community Feed</h2>
+        <div id="disqus_thread"></div>
+        <script>
+            (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://test-vicufszv5b.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
     </div>
-
-    <canvas id="canvas"></canvas>
 
     <div class="toolbar">
         <div class="tool-group">
-            <label>COLOR</label>
-            <input type="color" id="colorPicker" value="#38bdf8">
-        </div>
-
-        <div class="tool-group">
-            <label>SIZE</label>
-            <input type="range" id="sizePicker" min="1" max="50" value="5">
+            <input type="color" id="colorPicker" value="#38bdf8" style="border:none; width:25px; height:25px; background:none; cursor:pointer;">
+            <input type="range" id="sizePicker" min="1" max="50" value="5" style="width:60px; accent-color:var(--accent-color);">
         </div>
 
         <div class="tool-group">
             <button id="drawBtn" class="btn active">브러시</button>
             <button id="eraseBtn" class="btn">지우개</button>
-        </div>
-
-        <div class="tool-group">
             <button id="clearBtn" class="btn" style="color: #ef4444;">삭제</button>
         </div>
 
         <div style="width: 1px; height: 20px; background: rgba(255,255,255,0.1); margin: 0 5px;"></div>
 
-        <button class="btn btn-inquiry" onclick="toggleModal(true)">제휴 문의</button>
+        <button class="btn btn-comment" onclick="document.getElementById('comments').scrollIntoView({behavior: 'smooth'})">댓글</button>
+        <button class="btn" onclick="toggleModal(true)" style="background: rgba(168, 85, 247, 0.2); color: #a855f7;">제휴</button>
     </div>
 
     <!-- 제휴 문의 모달 -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
-            <button class="btn-close" onclick="toggleModal(false)">&times;</button>
-            <h2>제휴 문의</h2>
-            <p>유성식과의 협업 또는 제휴를 원하시면 아래 폼을 작성해 주세요. 확인 후 연락드리겠습니다.</p>
-            
+            <button onclick="toggleModal(false)" style="position:absolute; top:20px; right:20px; background:none; border:none; color:white; font-size:1.5rem; cursor:pointer;">&times;</button>
+            <h2 style="color: var(--accent-color); margin-top:0;">제휴 문의</h2>
             <form action="https://formspree.io/f/maqpgvqy" method="POST">
-                <div class="form-group">
-                    <label>성함 / 기업명</label>
-                    <input type="text" name="name" placeholder="홍길동" required>
-                </div>
-                <div class="form-group">
-                    <label>이메일 주소</label>
-                    <input type="email" name="_replyto" placeholder="example@email.com" required>
-                </div>
-                <div class="form-group">
-                    <label>문의 내용</label>
-                    <textarea name="message" placeholder="함께하고 싶은 아이디어나 문의 내용을 남겨주세요." required></textarea>
-                </div>
+                <div class="form-group"><label>성함 / 기업명</label><input type="text" name="name" required></div>
+                <div class="form-group"><label>이메일 주소</label><input type="email" name="_replyto" required></div>
+                <div class="form-group"><label>문의 내용</label><textarea name="message" required></textarea></div>
                 <button type="submit" class="btn-submit">문의 보내기</button>
             </form>
         </div>
@@ -340,27 +256,17 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        function startDrawing(e) {
-            if (e.target.tagName !== 'CANVAS') return;
-            isDrawing = true;
-            [lastX, lastY] = getCoordinates(e);
-        }
-
+        function startDrawing(e) { if (e.target.tagName !== 'CANVAS') return; isDrawing = true; [lastX, lastY] = getCoordinates(e); }
         function draw(e) {
             if (!isDrawing) return;
             const [x, y] = getCoordinates(e);
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(x, y);
+            ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y);
             ctx.strokeStyle = mode === 'draw' ? colorPicker.value : '#050505';
             ctx.lineWidth = sizePicker.value;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round'; ctx.lineJoin = 'round';
             if (mode === 'draw') { ctx.shadowBlur = 2; ctx.shadowColor = colorPicker.value; }
             else { ctx.shadowBlur = 0; }
-            ctx.stroke();
-            [lastX, lastY] = [x, y];
-            saveCanvas();
+            ctx.stroke(); [lastX, lastY] = [x, y]; saveCanvas();
         }
 
         function stopDrawing() { isDrawing = false; }
@@ -391,15 +297,8 @@
             }
         }
 
-        // 모달 토글
-        function toggleModal(show) {
-            modalOverlay.style.display = show ? 'flex' : 'none';
-        }
-
-        // 모달 외부 클릭 시 닫기
-        modalOverlay.onclick = (e) => {
-            if (e.target === modalOverlay) toggleModal(false);
-        };
+        function toggleModal(show) { modalOverlay.style.display = show ? 'flex' : 'none'; }
+        modalOverlay.onclick = (e) => { if (e.target === modalOverlay) toggleModal(false); };
     </script>
 </body>
 </html>
